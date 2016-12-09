@@ -28,6 +28,10 @@ app.listen(3000, () => {
   console.log('Started on port 3000');
 });
 
+module.exports = {
+  app
+};
+
 //Creating new user example
 // var newUser = new User({
 //   email: 'abc@123.com'
