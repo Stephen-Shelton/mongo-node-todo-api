@@ -32,6 +32,19 @@ module.exports = {
   app
 };
 
+app.get('/todos', (req, res) => {
+  Todo.find()
+    .then((todos) => {
+      //we send an object instead of todos array for more flexibility
+      res.send({
+        todos
+      });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
 //Creating new user example
 // var newUser = new User({
 //   email: 'abc@123.com'
