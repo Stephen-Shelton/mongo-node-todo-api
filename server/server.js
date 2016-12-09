@@ -61,7 +61,6 @@ app.get('/todos/:id', (req, res) => {
     if (!todo) {
       return res.status(404).send();
     } else {
-      console.log(todo);
       res.send({todo});
     }
   })
