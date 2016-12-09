@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser'); //takes JSON and converts it into an object which we use to attach to the request object
+var {ObjectId} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
@@ -43,6 +44,30 @@ app.get('/todos', (req, res) => {
     .catch((err) => {
       res.status(400).send(err);
     });
+});
+
+//':id' is our url parameter, creates an id variable
+app.get('/todos/:id', (req, res) => {
+  var id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Todo.findById({
+    _id: id
+  })
+  .then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    } else {
+      console.log(todo);
+      res.send({todo});
+    }
+  })
+  .catch((err) => {
+    res.status(400).send();
+  });
 });
 
 //Creating new user example
