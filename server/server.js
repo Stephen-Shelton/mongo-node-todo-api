@@ -7,6 +7,7 @@ var {Todo} = require('./models/todo.js');
 var {User} = require('./models/user.js');
 
 var app = express();
+const port = process.env.PORT || 3000; //heroku sets process.env.PORT
 
 //app.use for middleware
 app.use(bodyParser.json());
@@ -24,14 +25,6 @@ app.post('/todos', (req, res) => {
       res.status(400).send(err);
     });
 });
-
-app.listen(3000, () => {
-  console.log('Started on port 3000');
-});
-
-module.exports = {
-  app
-};
 
 app.get('/todos', (req, res) => {
   Todo.find()
@@ -68,6 +61,14 @@ app.get('/todos/:id', (req, res) => {
     res.status(400).send();
   });
 });
+
+app.listen(port, () => {
+  console.log(`Started up at ${port}`);
+});
+
+module.exports = {
+  app
+};
 
 //Creating new user example
 // var newUser = new User({
