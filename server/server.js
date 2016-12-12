@@ -111,6 +111,24 @@ app.patch('/todos/:id', (req, res) => {
     });
 });
 
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  user.save()
+    .then(() => {
+      return user.generateAuthToken();
+    })
+    .then((token) => {
+      //create custom header with 'x-nameOfHeader'
+      //user arg refers to user defined in var user = new User(body);
+      res.header('x-auth', token).send(user);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
 app.listen(port, () => {
   console.log(`Started up at ${port}`);
 });
