@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator'); //library to validate emails
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 /*
 Example user doc
@@ -45,7 +46,7 @@ var UserSchema = new mongoose.Schema({
   }]
 });
 
-//override a method with a custom method, goal to return trimmed data to user
+//override a method with a custom method, goal to return object with limited data back to user
 UserSchema.methods.toJSON = function() {
   var user = this;
   //toObject, a native mongoose method, takes a complex mongoose user/doc and converts it to a regular object
@@ -67,6 +68,23 @@ UserSchema.methods.generateAuthToken = function() {
       return token;
     });
 };
+
+//run code before you run an event 'save', we use mongoose middleware to help us hash pws before we save them to the db
+UserSchema.pre('save', function(next) {
+  var user = this;
+
+  if (user.isModified('password')) {
+    var password = user.password;
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(password, salt, (err, hash) => {
+        user.password = hash; //overrides the old pw
+        next(); //call next to proceed with middleware
+      });
+    });
+  } else {
+    next();
+  }
+});
 
 //Create model method with .statics (.methods for instance methods)
 UserSchema.statics.findByToken = function(token) {

@@ -15,6 +15,7 @@ const port = process.env.PORT; //heroku sets process.env.PORT
 //app.use for middleware
 app.use(bodyParser.json());
 
+//TO-DO ROUTES
 app.post('/todos', (req, res) => {
   var todo = new Todo({
     text: req.body.text
@@ -112,6 +113,7 @@ app.patch('/todos/:id', (req, res) => {
     });
 });
 
+//USER ROUTES
 //1st private route
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
