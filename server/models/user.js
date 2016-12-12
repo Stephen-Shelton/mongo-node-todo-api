@@ -68,6 +68,30 @@ UserSchema.methods.generateAuthToken = function() {
     });
 };
 
+//Create model method with .statics (.methods for instance methods)
+UserSchema.statics.findByToken = function(token) {
+  var User = this; //binding is to model since it's a model method
+  var decoded; //will store decoded jwt values from jwt.verify()
+
+  //any code errors in try => code stops execution and goes to catch block
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (err) {
+    //if error with try, return promise that gets rejected / passed to catch statement in '/users/me' get request
+    // return new Promise((resolve, reject) => {
+    //   reject();
+    // });
+    return Promise.reject(); //same as 3 lines above, can pass in val too
+  }
+
+  //if try successful, returns a promise with user to /users/me get request
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
+
 //Define model here passing in model name and schema
 var User = mongoose.model('User', UserSchema);
 
