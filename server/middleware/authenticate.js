@@ -12,7 +12,7 @@ var authenticate = (req, res, next) => {
       }
 
       req.user = user;
-      res.token = token;
+      req.token = token;
       next();
     })
     .catch((err) => {

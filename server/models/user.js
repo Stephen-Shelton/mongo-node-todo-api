@@ -69,22 +69,17 @@ UserSchema.methods.generateAuthToken = function() {
     });
 };
 
-//run code before you run an event 'save', we use mongoose middleware to help us hash pws before we save them to the db
-UserSchema.pre('save', function(next) {
+UserSchema.methods.removeToken = function(token) {
+  //have array of tokens, want to remove any object from array that has token that matches token passed in
   var user = this;
+  //pull any object from tokens array whose token val matches token arg
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  });
+};
 
-  if (user.isModified('password')) {
-    var password = user.password;
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(password, salt, (err, hash) => {
-        user.password = hash; //overrides the old pw
-        next(); //call next to proceed with middleware
-      });
-    });
-  } else {
-    next();
-  }
-});
 
 UserSchema.statics.findByCredentials = function(email, password) {
   var User = this;
@@ -129,6 +124,23 @@ UserSchema.statics.findByToken = function(token) {
     'tokens.access': 'auth'
   });
 };
+
+//run code before you run an event 'save', we use mongoose middleware to help us hash pws before we save them to the db
+UserSchema.pre('save', function(next) {
+  var user = this;
+
+  if (user.isModified('password')) {
+    var password = user.password;
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(password, salt, (err, hash) => {
+        user.password = hash; //overrides the old pw
+        next(); //call next to proceed with middleware
+      });
+    });
+  } else {
+    next();
+  }
+});
 
 //Define model here passing in model name and schema
 var User = mongoose.model('User', UserSchema);
