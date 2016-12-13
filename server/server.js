@@ -3,6 +3,7 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser'); //takes JSON and converts it into an object which we use to attach to the request object
 const {ObjectId} = require('mongodb');
+const bcrypt = require('bcryptjs');
 
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
@@ -136,6 +137,22 @@ app.post('/users', (req, res) => {
       res.status(400).send(err);
     });
 });
+
+app.post('/users/login', authenticate, (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password)
+    .then((user) => {
+      return user.generateAuthToken()
+        .then((token) => {
+          res.header('x-auth', token).send(user);
+        });
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+});
+
 
 app.listen(port, () => {
   console.log(`Started up at ${port}`);

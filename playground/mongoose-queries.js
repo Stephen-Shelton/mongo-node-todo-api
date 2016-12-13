@@ -56,7 +56,3 @@ User.findById({
 .catch((err) => {
   console.log(err);
 });
-//cases:
-  //user not found
-  //user found, print user to screen
-  //any other errors with catch
