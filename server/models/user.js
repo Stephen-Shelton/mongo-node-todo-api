@@ -58,7 +58,7 @@ UserSchema.methods.toJSON = function() {
 UserSchema.methods.generateAuthToken = function() {
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
   user.tokens.push({access, token});
 
@@ -108,7 +108,7 @@ UserSchema.statics.findByToken = function(token) {
 
   //any code errors in try => code stops execution and goes to catch block
   try {
-    decoded = jwt.verify(token, 'abc123'); //'abc123' is our secret token
+    decoded = jwt.verify(token, process.env.JWT_SECRET); //process.env.JWT_SECRET is our secret token
   } catch (err) {
     //if error with try, return promise that gets rejected / passed to catch statement in '/users/me' get request
     // return new Promise((resolve, reject) => {
